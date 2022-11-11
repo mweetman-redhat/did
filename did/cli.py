@@ -218,7 +218,7 @@ def main(arguments=None):
             if options.merge:
                 utils.item(user, 1, options=options)
             else:
-                utils.header(user)
+                utils.header(user, did.base.Config().border_count, did.base.Config().border_char)
             user_stats = UserStats(user=user, options=options)
             user_stats.check()
             team_stats.merge(user_stats)

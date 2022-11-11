@@ -155,9 +155,9 @@ def load_components(*paths, **kwargs):
     return num_loaded
 
 
-def header(text):
+def header(text, border_count=79, border_char="~"):
     """ Show text as a header. """
-    print("\n{0}\n {1}\n{0}".format(79 * "~", text))
+    print("\n{0}\n {1}\n{0}".format(border_count * border_char, text))
 
 
 def shorted(text, width=79):

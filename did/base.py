@@ -150,6 +150,22 @@ class Config(object):
         except (NoOptionError, NoSectionError):
             return MAX_WIDTH
 
+    @property
+    def border_char(self):
+        """ Border character to use for the report """
+        try:
+            return self.parser.get("general", "border_char")
+        except (NoOptionError, NoSectionError):
+            return "~"
+
+    @property
+    def border_count(self):
+        """ Number of border characters to use for the report """
+        try:
+            return int(self.parser.get("general", "border_count"))
+        except (NoOptionError, NoSectionError):
+            return 79
+
     def sections(self, kind=None):
         """ Return all sections (optionally of given kind only) """
         result = []
