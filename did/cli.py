@@ -227,7 +227,7 @@ def main(arguments=None):
         # Display merged team report
         if options.merge or options.total:
             if options.total:
-                utils.header("Total Report")
+                utils.header("Total Report", did.base.Config().border_count, did.base.Config().border_char)
             team_stats.show()
 
         # Return all gathered stats objects
