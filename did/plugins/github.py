@@ -15,16 +15,19 @@ queries are limited. For more details see `GitHub API`__ docs.
 Use ``login`` to override the default email address for searching.
 See the :doc:`config` documentation for details on using aliases.
 
+Alternatively to ``token`` you can use ``token_file`` to have the
+token stored in a file rather than in your did config file.
+
 __ https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 
-"""
+"""  # noqa: W505,E501
 
 import json
 import re
 
 import requests
 
-from did.base import Config, ReportError
+from did.base import Config, ReportError, get_token
 from did.stats import Stats, StatsGroup
 from did.utils import listed, log, pretty
 
@@ -88,7 +91,8 @@ class GitHub(object):
                 log.debug(error)
                 raise ReportError(f"GitHub JSON failed: {response.text}.")
 
-            # Update url to the next page, break if no next page provided
+            # Update url to the next page, break if no next page
+            # provided
             if 'next' in response.links:
                 url = response.links['next']['url']
             else:
@@ -150,6 +154,18 @@ class IssuesClosed(Stats):
             Issue(issue) for issue in self.parent.github.search(query)]
 
 
+class IssueCommented(Stats):
+    """ Issues commented """
+
+    def fetch(self):
+        log.info("Searching for issues commented on by {0}".format(self.user))
+        query = "search/issues?q=commenter:{0}+updated:{1}..{2}".format(
+            self.user.login, self.options.since, self.options.until)
+        query += "+type:issue"
+        self.stats = [
+            Issue(issue) for issue in self.parent.github.search(query)]
+
+
 class PullRequestsCreated(Stats):
     """ Pull requests created """
 
@@ -157,6 +173,19 @@ class PullRequestsCreated(Stats):
         log.info("Searching for pull requests created by {0}".format(
             self.user))
         query = "search/issues?q=author:{0}+created:{1}..{2}".format(
+            self.user.login, self.options.since, self.options.until)
+        query += "+type:pr"
+        self.stats = [
+            Issue(issue) for issue in self.parent.github.search(query)]
+
+
+class PullRequestsCommented(Stats):
+    """ Pull requests commented """
+
+    def fetch(self):
+        log.info("Searching for pull requests commented on by {0}".format(
+            self.user))
+        query = "search/issues?q=commenter:{0}+updated:{1}..{2}".format(
             self.user.login, self.options.since, self.options.until)
         query += "+type:pr"
         self.stats = [
@@ -209,22 +238,25 @@ class GitHubStats(StatsGroup):
             raise ReportError(
                 "No github url set in the [{0}] section".format(option))
         # Check authorization token
-        try:
-            self.token = config["token"]
-        except KeyError:
-            self.token = None
+        self.token = get_token(config)
         self.github = GitHub(self.url, self.token)
         # Create the list of stats
         self.stats = [
             IssuesCreated(
                 option=option + "-issues-created", parent=self,
                 name="Issues created on {0}".format(option)),
+            IssueCommented(
+                option=option + "-issues-commented", parent=self,
+                name="Issues commented on {0}".format(option)),
             IssuesClosed(
                 option=option + "-issues-closed", parent=self,
                 name="Issues closed on {0}".format(option)),
             PullRequestsCreated(
                 option=option + "-pull-requests-created", parent=self,
                 name="Pull requests created on {0}".format(option)),
+            PullRequestsCommented(
+                option=option + "-pull-requests-commented", parent=self,
+                name="Pull requests commented on {0}".format(option)),
             PullRequestsClosed(
                 option=option + "-pull-requests-closed", parent=self,
                 name="Pull requests closed on {0}".format(option)),

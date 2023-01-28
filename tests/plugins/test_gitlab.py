@@ -1,8 +1,6 @@
 # coding: utf-8
 """ Tests for the GitLab plugin """
 
-import time
-
 import pytest
 
 import did.base
@@ -12,7 +10,7 @@ import did.cli
 #  Constants
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-INTERVAL = "--since 2017-05-24 --until 2017-05-26"
+INTERVAL = "--since 2023-01-20 --until 2023-01-20"
 APPROVED_INTERVAL = "--since 2021-04-08 --until 2021-04-09"
 
 CONFIG_NOTOKEN = """
@@ -40,7 +38,7 @@ def test_gitlab_issues_created():
     option = "--gitlab-issues-created "
     stats = did.cli.main(option + INTERVAL)[0][0].stats[0].stats[0].stats
     assert any([
-        "did.tester/test-project#001 - the readme is almost empty"
+        "did.tester/test-project#003 - the readme is almost empty"
         in str(stat) for stat in stats])
 
 
@@ -50,7 +48,7 @@ def test_gitlab_issues_commented():
     option = "--gitlab-issues-commented "
     stats = did.cli.main(option + INTERVAL)[0][0].stats[0].stats[1].stats
     assert any([
-        "did.tester/test-project#001 - the readme is almost empty"
+        "did.tester/test-project#003 - the readme is almost empty"
         in str(stat) for stat in stats])
 
 
@@ -60,7 +58,7 @@ def test_gitlab_issues_closed():
     option = "--gitlab-issues-closed "
     stats = did.cli.main(option + INTERVAL)[0][0].stats[0].stats[2].stats
     assert any([
-        "did.tester/test-project#001 - the readme is almost empty"
+        "did.tester/test-project#003 - the readme is almost empty"
         in str(stat) for stat in stats])
 
 
@@ -70,7 +68,7 @@ def test_gitlab_merge_requests_created():
     option = "--gitlab-merge-requests-created "
     stats = did.cli.main(option + INTERVAL)[0][0].stats[0].stats[3].stats
     assert any([
-        "did.tester/test-project#001 - Update README.md" in str(stat)
+        "did.tester/test-project#004 - Update README.md" in str(stat)
         for stat in stats])
 
 
@@ -80,7 +78,7 @@ def test_gitlab_merge_requests_commented():
     option = "--gitlab-merge-requests-commented "
     stats = did.cli.main(option + INTERVAL)[0][0].stats[0].stats[4].stats
     assert any([
-        "did.tester/test-project#001 - Update README.md" in str(stat)
+        "did.tester/test-project#004 - Update README.md" in str(stat)
         for stat in stats])
 
 
@@ -90,7 +88,7 @@ def test_gitlab_merge_requests_closed():
     option = "--gitlab-merge-requests-closed "
     stats = did.cli.main(option + INTERVAL)[0][0].stats[0].stats[6].stats
     assert any([
-        "did.tester/test-project#001 - Update README.md" in str(stat)
+        "did.tester/test-project#004 - Update README.md" in str(stat)
         for stat in stats])
 
 

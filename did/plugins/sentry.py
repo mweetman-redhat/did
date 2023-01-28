@@ -10,8 +10,10 @@ Configuration example::
     organization = team
     token = ...
 
-You need to generate authentication token at the server.
-The only scope you need to enable is `org:read`.
+You need to generate authentication token at the server. The only
+scope you need to enable is `org:read`. If you prefer to store the
+token in a file, use ``token_file`` to point to the file that has
+your token.
 """
 
 import re
@@ -19,7 +21,7 @@ import re
 import dateutil
 import requests
 
-from did.base import Config, ConfigError, ReportError
+from did.base import Config, ConfigError, ReportError, get_token
 from did.stats import Stats, StatsGroup
 from did.utils import listed, log, pretty
 
@@ -107,7 +109,8 @@ class Sentry(object):
                 log.debug("Fetched {0}.".format(listed(len(data), 'activity')))
                 log.data(pretty(data))
                 for activity in [Activity(item) for item in data]:
-                    # We've reached the last page, older records not relevant
+                    # We've reached the last page, older records not
+                    # relevant
                     if activity.created < self.stats.options.since.date:
                         return activities
                     # Store only relevant activites (before until date)
@@ -162,10 +165,13 @@ class SentryStats(StatsGroup):
         StatsGroup.__init__(self, option, name, parent, user)
         # Check config for required fields
         config = dict(Config().section(option))
-        for field in ['url', 'organization', 'token']:
+        for field in ['url', 'organization']:
             if field not in config:
-                raise ConfigError(
-                    "No {0} set in the [{1}] section".format(field, option))
+                raise ConfigError(f"No {field} set in the [{option}] section")
+        config["token"] = get_token(config)
+        if config["token"] is None:
+            raise ConfigError(
+                f"No token or token_file set in the [{option}] section")
         # Set up the Sentry API and construct the list of stats
         self.sentry = Sentry(config=config, stats=self)
         self.stats = [

@@ -12,14 +12,15 @@ Config example::
 
 Use ``login`` to override the default email address for searching.
 See the :doc:`config` documentation for details on using aliases.
-The authentication token is optional.
+The authentication token is optional and can be stored in a file
+pointed to by ``token_file`` instead of ``token``.
 """
 
 import datetime
 
 import requests
 
-from did.base import Config, ReportError
+from did.base import Config, ReportError, get_token
 from did.stats import Stats, StatsGroup
 from did.utils import listed, log, pretty
 
@@ -57,7 +58,8 @@ class Pagure(object):
             log.debug("Result: {0} fetched".format(
                 listed(len(objects), "item")))
             log.data(pretty(data))
-            # FIXME later: Work around https://pagure.io/pagure/issue/4057
+            # FIXME later:
+            # Work around https://pagure.io/pagure/issue/4057
             if not objects:
                 break
             result.extend(objects)
@@ -149,7 +151,8 @@ class PullRequestsCreated(Stats):
 #        issues = [Issue(issue) for issue in self.parent.pagure.search(
 #            query='user/{0}/requests/actionable?'
 #                'status=all&closed={1}..{2}'.format(
-#                self.user.login, self.options.since, self.options.until),
+#                self.user.login, self.options.since,
+#                self.options.until),
 #            pagination='pagination',
 #            result_field='requests')]
 #        self.stats = sorted(issues, key=lambda i: unicode(i))
@@ -175,10 +178,7 @@ class PagureStats(StatsGroup):
             raise ReportError(
                 'No Pagure url set in the [{0}] section'.format(option))
         # Check authorization token
-        try:
-            self.token = config['token']
-        except KeyError:
-            self.token = None
+        self.token = get_token(config)
         self.pagure = Pagure(self.url, self.token)
         # Create the list of stats
         self.stats = [
