@@ -210,7 +210,7 @@ def main(arguments=None):
         print(header)
         team_stats = UserStats(options=options)
         if options.merge:
-            utils.header("Total Report")
+            utils.header("Total Report", did.base.Config().border_count, did.base.Config().border_char)
             utils.item("Users: {0}".format(len(users)), options=options)
 
         # Check individual user stats
