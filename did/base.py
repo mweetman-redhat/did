@@ -151,18 +151,18 @@ class Config(object):
             return MAX_WIDTH
 
     @property
-    def border_char(self):
-        """ Border character to use for the report """
+    def separator_char(self):
+        """ Separator character to use for the report """
         try:
-            return self.parser.get("general", "border_char")
+            return self.parser.get("general", "separator_char")
         except (NoOptionError, NoSectionError):
             return "~"
 
     @property
-    def border_count(self):
-        """ Number of border characters to use for the report """
+    def separator_count(self):
+        """ Number of separator characters to use for the report """
         try:
-            return int(self.parser.get("general", "border_count"))
+            return int(self.parser.get("general", "separator_count"))
         except (NoOptionError, NoSectionError):
             return 79
 
