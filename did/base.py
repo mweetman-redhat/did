@@ -151,10 +151,10 @@ class Config(object):
             return MAX_WIDTH
 
     @property
-    def separator_char(self):
+    def separator(self):
         """ Separator character to use for the report """
         try:
-            return self.parser.get("general", "separator_char")
+            return self.parser.get("general", "separator")
         except (NoOptionError, NoSectionError):
             return "~"
 
