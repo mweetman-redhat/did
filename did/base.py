@@ -159,10 +159,10 @@ class Config(object):
             return "~"
 
     @property
-    def separator_count(self):
+    def separator_width(self):
         """ Number of separator characters to use for the report """
         try:
-            return int(self.parser.get("general", "separator_count"))
+            return int(self.parser.get("general", "separator_width"))
         except (NoOptionError, NoSectionError):
             return 79
 
